@@ -27,7 +27,8 @@ import java.io.IOException
 //}
 
 data class ShoppingListUiState(
-    val shoppingList: List<ShoppingListItem>?
+    val shoppingList: List<ShoppingListItem> = listOf(),
+    val shoppingMode: Boolean = false
 )
 
 class ShoppingListViewModel(private val shoppingListRepository: ShoppingListRepository): ViewModel() {
@@ -46,7 +47,7 @@ class ShoppingListViewModel(private val shoppingListRepository: ShoppingListRepo
         viewModelScope.launch {
             _uiState.update { it ->
                 val shoppingList = shoppingListRepository.getShoppingList().data
-                it.copy(shoppingList = shoppingList)
+                it.copy(shoppingList = shoppingList.toMutableList())
             }
 //            shoppingListUiState = try {
 //                val shoppingList = ShoppingListApi.retrofitService.getShoppingList()
@@ -54,6 +55,24 @@ class ShoppingListViewModel(private val shoppingListRepository: ShoppingListRepo
 //            } catch (e: IOException) {
 //                ShoppingListUiState.Error
 //            }
+        }
+    }
+
+    fun toggleShoppingMode() {
+        _uiState.update { it ->
+            it.copy(shoppingMode = !it.shoppingMode)
+        }
+    }
+
+    fun deleteItem(itemID: Int) {
+        viewModelScope.launch {
+            shoppingListRepository.removeItem(itemID)
+            _uiState.update { it ->
+                val newList = it.shoppingList.filter { it ->
+                    it.id != itemID
+                }
+                it.copy(shoppingList = newList)
+            }
         }
     }
 
