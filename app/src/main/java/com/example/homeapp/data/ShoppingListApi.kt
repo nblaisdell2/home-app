@@ -1,6 +1,7 @@
 package com.example.homeapp.data
 
 import com.example.homeapp.network.responses.ResponseObject
+import com.example.homeapp.network.responses.ShoppingListData
 import com.example.homeapp.network.responses.ShoppingListItem
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
@@ -8,6 +9,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.http.DELETE
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -22,13 +25,15 @@ private val retrofit = Retrofit.Builder()
 
 interface ShoppingListApiService {
     @GET("get_shopping_list")
-    suspend fun getShoppingList(): ResponseObject<List<ShoppingListItem>>
+    suspend fun getShoppingList(): ResponseObject<ShoppingListData>
 
+    @FormUrlEncoded
     @POST("add_item")
-    suspend fun addItem(itemName: String, storeName: String): Unit
+    suspend fun addItem(@Field("itemName") itemName: String, @Field("storeName") storeName: String): Unit
 
+    @FormUrlEncoded
     @PUT("update_item")
-    suspend fun updateItem(itemID: Int, newItemName: String, newStoreName: String): Unit
+    suspend fun updateItem(@Field("itemID") itemID: Int, @Field("newItemName") newItemName: String, @Field("newStoreName") newStoreName: String): Unit
 
     @DELETE("remove_item/{itemID}")
     suspend fun removeItem(@Path("itemID") itemID: Int): Unit

@@ -10,6 +10,12 @@ data class ResponseObject<out T>(
 )
 
 @Serializable
+data class ShoppingListData(
+    val items: List<ShoppingListItem>,
+    val stores: List<Store>
+)
+
+@Serializable
 data class ShoppingListItem(
     val id: Int,
     val name: String,
